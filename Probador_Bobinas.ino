@@ -1,14 +1,15 @@
 /*
- * Probador de bobinas de encendido
- * ESP32-C3 Super Mini + PC817 + IRLZ44N
+ * Probador de bobinas de encendido COP
+ * ESP32-C3 Super Mini + PC817 + IGBT FGH60N60SFD (PCB v2)
  *
  * El potenciometro controla la frecuencia de disparo (10-200 Hz).
  * El dwell (tiempo de carga de la bobina) se mantiene fijo en 3 ms
- * recalculando el duty en cada cambio, con tope de seguridad del 40%.
+ * recalculando el duty en cada cambio, con tope de seguridad del 40%
+ * (a mas de ~133 Hz el tope reduce el dwell gradualmente).
  *
- * Conexiones:
- *   GPIO3  <- cursor del potenciometro (extremos a 3V3 y GND)
- *   GPIO4  -> R1 220R -> pin 1 PC817 (pin 2 a GND logico)
+ * Conexiones (segun PCB v2):
+ *   GPIO3  <- cursor del potenciometro WH148 (extremos a 3V3 y GND)
+ *   GPIO4  -> R1 150R -> pin 1 PC817 (pin 2 a GND logico)
  *   GPIO8  -> SDA de la LCD 20x4 (backpack PCF8574, alimentada a 5V)
  *   GPIO9  -> SCL de la LCD
  *
@@ -25,15 +26,12 @@ const int   PIN_SDA   = 8;
 const int   PIN_SCL   = 9;
 
 const int   FREQ_MIN  = 10;    // Hz (= 300 RPM en motor 4 cil.)
-// LIMITE DE SEGURIDAD: con el IRLZ44N (clamp 55V) la energia de la bobina
-// se disipa en avalancha dentro del MOSFET y a alta frecuencia lo quema.
-// Con 60 Hz maximo la disipacion queda en ~1 W (usar disipador igual).
-// Si cambias a un IGBT de encendido (FGP3040/ISL9V3040), sube esto a 200.
-const int   FREQ_MAX  = 60;    // Hz (= 1800 RPM en motor 4 cil.)
-// 2 ms: con el primario de 3.2 ohms la corriente llega a ~2.4 A, energia
-// suficiente para chispa y ~30% menos calor de avalancha en el MOSFET.
-// Con IGBT puedes volver a 3.0 si quieres chispa mas gorda.
-const float DWELL_MS  = 2.0;   // tiempo de carga de la bobina
+// Con el IGBT FGH60N60SFD (600 V) el flyback de la bobina ya no se disipa
+// en avalancha: el rango completo es seguro. (Con el IRLZ44N del prototipo
+// v1 habia que limitar a 60 Hz porque el MOSFET clampeaba a 55 V y ardia.)
+const int   FREQ_MAX  = 200;   // Hz (= 6000 RPM en motor 4 cil.)
+// 3 ms: dwell tipico de bobina COP (primario 3.2 ohms -> ~3 A de pico).
+const float DWELL_MS  = 3.0;   // tiempo de carga de la bobina
 const float DUTY_MAX  = 0.40;  // tope de seguridad de duty (40%)
 
 // 14 bits: con el reloj de 80 MHz el LEDC acepta de 4.8 Hz a 4.8 kHz,
