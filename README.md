@@ -2,10 +2,17 @@
 
 Generador de disparos PWM para probar bobinas de encendido (COP). Un potenciómetro
 controla la frecuencia (10–200 Hz ≈ 300–6000 RPM en motor de 4 cilindros) y el
-firmware mantiene un **dwell fijo de 3 ms** recalculando el duty. LCD 20x4 I2C
-opcional (el sketch la detecta solo; si no está, funciona igual y reporta por Serial).
+firmware mantiene un **dwell fijo de 3 ms** recalculando el duty. La pantalla
+**OLED 128×64 I2C** muestra RPM, frecuencia, dwell y el logo SISU.
 
 Diseñado por **Ramiro** · Logo SISU en la serigrafía inferior de la placa.
+
+## Carcasa imprimible
+
+![Render de la carcasa completa y su tapa](Carcasa%20del%20probador%20de%20bobinas/render_carcasa_completa.png)
+
+Los archivos `carcasa.gcode` y `tapa carcasa.gcode` están listos para impresión
+y fueron generados con OrcaSlicer.
 
 ## Estructura del repositorio
 
@@ -16,6 +23,7 @@ Diseñado por **Ramiro** · Logo SISU en la serigrafía inferior de la placa.
 | `Probador_Bobinas_PCB/PARA_FABRICAR/` | **Gerbers ZIP** — se sube tal cual a JLCPCB/PCBWay (2 capas, 1.6 mm, 1 oz) |
 | `Probador_Bobinas_PCB/fabricacion/` | STEP 3D de la placa armada, esquemático PDF y BOM CSV |
 | `PCB bobina Imprimir/` | PDFs 1:1 para **fabricación casera**: cobre para planchar (2), máscara UV (2), serigrafía (2) y STEP del LCD 20x4 para la carcasa |
+| `Carcasa del probador de bobinas/` | G-code de la carcasa y la tapa, más su render conjunto |
 | `libreria_kicad_SnapEDA/` | Librería KiCad autocontenida: símbolos, footprints y modelos 3D de todas las partes no estándar |
 
 > Para abrir el proyecto KiCad en otra PC: registrar `libreria_kicad_SnapEDA` como
@@ -28,7 +36,7 @@ Diseñado por **Ramiro** · Logo SISU en la serigrafía inferior de la placa.
   gate-emisor — reemplaza al IRLZ44N del prototipo (que avalanchaba a 55 V)
 - Alimentación lógica: módulo **LM2596** 12 V → 5 V
 - Clemas WAGO 236-402 (12 V y bobina), potenciómetro WH148 al borde (panel),
-  header 1x4 para el LCD I2C
+  header 1x4 para la pantalla OLED I2C
 - Reglas de diseño: pista del colector con **2.5 mm de separación** (flyback
   ~400 V), potencia a 2 mm (10 A pulsados), señales a 0.8 mm (aptas para planchado)
 - Plano de tierra cuadriculado en ambas caras; taladros M3 de esquina **H1/H2/H4
@@ -42,7 +50,7 @@ Diseñado por **Ramiro** · Logo SISU en la serigrafía inferior de la placa.
 |---|---|
 | Clema J2 | Entrada 12 V (batería/fuente que aguante picos de 5–10 A) + fusible 5 A externo |
 | Clema J1 | Primario de la bobina COP |
-| Header J3 | LCD 20x4 I2C: 5V · GND · SDA (GPIO8) · SCL (GPIO9) |
+| Header J3 | OLED 128×64 I2C: 5V · GND · SDA (GPIO8) · SCL (GPIO9) |
 | Cuerpo (rosca) de la bujía | GND de potencia — sin esto no hay chispa |
 
 ## Compilar y subir (Arduino IDE)
@@ -50,7 +58,7 @@ Diseñado por **Ramiro** · Logo SISU en la serigrafía inferior de la placa.
 1. Instalar el core ESP32: Preferencias → URLs adicionales →
    `https://espressif.github.io/arduino-esp32/package_esp32_index.json`,
    luego Boards Manager → instalar "esp32 by Espressif Systems".
-2. Instalar la librería **LiquidCrystal I2C** (Frank de Brabander).
+2. Instalar las librerías **Adafruit GFX** y **Adafruit SSD1306**.
 3. Placa: **ESP32C3 Dev Module**, con **USB CDC On Boot: Enabled**.
 4. Compilar y subir. Si no entra en modo de programación: mantener BOOT,
    pulsar RESET, soltar BOOT.

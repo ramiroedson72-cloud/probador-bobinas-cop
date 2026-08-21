@@ -581,7 +581,7 @@
       "netlist": "",
       "plot": "",
       "specctra_dsn": "",
-      "vrml": ""
+      "vrml": "../../../Probador_Bobinas_PCB.wrl"
     },
     "page_layout_descr_file": ""
   },
